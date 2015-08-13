@@ -4,7 +4,7 @@ class Game_Enemy
       if respond_to?(:skills)
         skills
       else
-        actions.map { |a| $data_skills[a.skill_id] }
+        enemy.actions.map { |a| $data_skills[a.skill_id] }
       end.select(&:passive?)
     end
   end
