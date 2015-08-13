@@ -2,7 +2,7 @@
 Passive skills for rpg maker VX ACE
 
 ###How to install
-- install as gem with SideScriptLoader OR
+- install as gem with SideScriptLoader (https://github.com/godsent/rpg-maker-side-script-loader) OR
 - add batch.rb to scripts of your project
 
 ###How to use
