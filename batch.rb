@@ -1,5 +1,6 @@
 #gems/passive_skills/lib/passive_skills.rb
 module PassiveSkills
+  VERSION = '0.0.2'
 end
 
 #gems/passive_skills/lib/passive_skills/patch.rb
@@ -12,6 +13,8 @@ class Game_Battler
     super + passive_skills_states
   end
 
+  private 
+
   def skill_states(skills)
     skills.map do |skill|
       skill.effects.select { |effect| effect.code == 21 }.map do  |effect|
@@ -19,16 +22,24 @@ class Game_Battler
       end
     end.flatten
   end
+
+  def passive_skills_states
+    return [] if @do_not_look_in_passive
+    @do_not_look_in_passive = true
+    all_skills = skills
+    @do_not_look_in_passive = false
+    skill_states all_skills.select(&:passive?)
+  end
 end
 #gems/passive_skills/lib/passive_skills/patch/game_enemy_patch.rb
 class Game_Enemy
   def passive_skills_states
-    skill_states begin 
-      if respond_to?(:skills)
-        skills
-      else
-        enemy.actions.map { |a| $data_skills[a.skill_id] }
-      end.select(&:passive?)
+    if respond_to? :skills
+      super
+    else
+      skill_states begin 
+        enemy.actions.map { |a| $data_skills[a.skill_id] }.select(&:passive?)
+      end
     end
   end
 end
@@ -61,15 +72,5 @@ class Window_SkillList
     unless skill.passive?
       draw_skill_cost_for_passive_skills rect, skill 
     end
-  end
-end
-#gems/passive_skills/lib/passive_skills/patch/game_actor_patch.rb
-class Game_Actor
-  def passive_skills_states
-    return [] if @do_not_look_in_passive
-    @do_not_look_in_passive = true
-    all_skills = skills
-    @do_not_look_in_passive = false
-    skill_states all_skills.select(&:passive?)
   end
 end
